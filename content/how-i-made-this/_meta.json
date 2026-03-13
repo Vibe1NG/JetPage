@@ -1,0 +1,8 @@
+{
+  "order": [
+    { "slug": "index", "title": "Overview" },
+    { "slug": "architecture", "title": "Architecture" },
+    { "slug": "phases", "title": "Build Phases" },
+    { "slug": "challenges", "title": "Challenges & Solutions" }
+  ]
+}

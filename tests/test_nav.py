@@ -10,10 +10,11 @@ def test_site_title(nav_tree):
 
 
 def test_documents_loaded(nav_tree):
-    assert len(nav_tree.documents) == 2
+    assert len(nav_tree.documents) == 3
     doc_ids = {d.id for d in nav_tree.documents}
     assert "user-guide" in doc_ids
     assert "reference" in doc_ids
+    assert "how-i-made-this" in doc_ids
 
 
 def test_nav_contains_home_page(nav_tree):
@@ -24,7 +25,7 @@ def test_nav_contains_home_page(nav_tree):
 
 def test_nav_sections_present(nav_tree):
     sections = [n for n in nav_tree.nodes if n.is_section]
-    assert len(sections) == 3
+    assert len(sections) == 4
 
 
 def test_section_children_populated(nav_tree):

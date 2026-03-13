@@ -7,10 +7,12 @@ from sitegen.config import CONTENT_DIR
 from sitegen.content import cache as page_cache
 from sitegen.core.document import get_document_for_slug
 from sitegen.core.nav import load_nav_tree
+from sitegen.core.navigation import get_breadcrumb, get_prev_next
 from sitegen.core.page_resolver import resolve
 from sitegen.core.search import search
 from sitegen.export.pdf_exporter import export_document
 from sitegen.export.pdf_server import pdf_server
+from sitegen.ui.controls.nav_controls import build_breadcrumb, build_prev_next_bar
 from sitegen.ui.controls.toc_panel import build_toc_panel
 from sitegen.ui.sidebar import build_sidebar
 
@@ -29,16 +31,13 @@ def build_app(page: ft.Page) -> None:
     _state = {"dark": False, "slug": "index", "tab_index": 0}
 
     # --- Content area ---
-    content_md = ft.Markdown(
-        value="",
-        extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
-        code_theme=ft.MarkdownCodeTheme.GITHUB,
-        selectable=True,
-        latex_scale_factor=1.2,
-    )
+    content_col = ft.Column(controls=[], tight=True)
+    breadcrumb_container = ft.Container()
+    prev_next_container = ft.Container()
+
     content_area = ft.Container(
         content=ft.Column(
-            controls=[content_md],
+            controls=[breadcrumb_container, content_col, prev_next_container],
             scroll=ft.ScrollMode.AUTO,
             expand=True,
         ),
@@ -74,6 +73,7 @@ def build_app(page: ft.Page) -> None:
         tooltip="Toggle dark mode",
         on_click=None,
     )
+
     def _tab_style(active: bool) -> ft.ButtonStyle:
         return ft.ButtonStyle(
             color=ft.Colors.WHITE if active else ft.Colors.BLUE_200,
@@ -176,6 +176,12 @@ def build_app(page: ft.Page) -> None:
             toc_container.content = None
             toc_container.width = 0
 
+    def _rebuild_nav_controls(slug: str) -> None:
+        crumbs = get_breadcrumb(slug, nav_tree)
+        prev, next_ = get_prev_next(slug, nav_tree)
+        breadcrumb_container.content = build_breadcrumb(crumbs, navigate, dark=_state["dark"])
+        prev_next_container.content = build_prev_next_bar(prev, next_, navigate, dark=_state["dark"])
+
     # --- Dark mode ---
 
     def on_dark_toggle(_e: ft.ControlEvent) -> None:
@@ -186,11 +192,14 @@ def build_app(page: ft.Page) -> None:
         content_area.bgcolor = ft.Colors.GREY_900 if dark else ft.Colors.WHITE
         dark_btn.icon = ft.Icons.LIGHT_MODE_OUTLINED if dark else ft.Icons.DARK_MODE_OUTLINED
         _rebuild_sidebar()
-        # Rebuild TOC with cached tokens
-        path = resolve(_state["slug"], CONTENT_DIR)
+        # Rebuild TOC and nav controls with cached tokens
+        slug = _state["slug"]
+        path = resolve(slug, CONTENT_DIR)
         if path:
             entry = page_cache.get_page(path)
             _rebuild_toc(entry.toc_tokens)
+            content_col.controls = _build_content_controls(entry.raw)
+        _rebuild_nav_controls(slug)
         page.update()
 
     dark_btn.on_click = on_dark_toggle
@@ -289,14 +298,35 @@ def build_app(page: ft.Page) -> None:
 
     download_btn.on_click = on_download_click
 
+    # --- Content building ---
+
+    def _build_content_controls(raw_md: str) -> list[ft.Control]:
+        from sitegen.content.code_splitter import CodeSegment, TextSegment, split_code_blocks
+        from sitegen.ui.controls.code_block import build_code_block
+
+        segments = split_code_blocks(raw_md)
+        controls: list[ft.Control] = []
+        for seg in segments:
+            if isinstance(seg, TextSegment):
+                md = ft.Markdown(
+                    value=seg.text,
+                    extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
+                    code_theme=ft.MarkdownCodeTheme.GITHUB,
+                    selectable=True,
+                    latex_scale_factor=1.2,
+                    on_tap_link=on_link_tap,
+                )
+                controls.append(md)
+            elif isinstance(seg, CodeSegment):
+                controls.append(build_code_block(seg.language, seg.code, page, dark=_state["dark"]))
+        return controls
+
     # --- Link handling ---
 
     def on_link_tap(e: ft.ControlEvent) -> None:
         href = e.data
         if href and not href.startswith("http"):
             navigate(href.strip("/"))
-
-    content_md.on_tap_link = on_link_tap
 
     # --- Route loading ---
 
@@ -308,18 +338,33 @@ def build_app(page: ft.Page) -> None:
             path = resolve(slug, CONTENT_DIR)
             if path:
                 entry = page_cache.get_page(path)
-                content_md.value = entry.raw
+                content_col.controls = _build_content_controls(entry.raw)
                 _rebuild_toc(entry.toc_tokens)
             else:
-                content_md.value = f"# Page Not Found\n\nThe page `{slug}` does not exist."
+                content_col.controls = [
+                    ft.Markdown(
+                        value=f"# Page Not Found\n\nThe page `{slug}` does not exist.",
+                        extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
+                        selectable=True,
+                        on_tap_link=on_link_tap,
+                    )
+                ]
                 _rebuild_toc([])
         except Exception as exc:
             logger.exception("Error loading page %r", slug)
-            content_md.value = f"# Error\n\nFailed to load `{slug}`:\n\n```\n{exc}\n```"
+            content_col.controls = [
+                ft.Markdown(
+                    value=f"# Error\n\nFailed to load `{slug}`:\n\n```\n{exc}\n```",
+                    extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
+                    selectable=True,
+                    on_tap_link=on_link_tap,
+                )
+            ]
             _rebuild_toc([])
 
         _rebuild_sidebar()
         _update_doc_tab(slug)
+        _rebuild_nav_controls(slug)
         download_btn.visible = bool(_current_doc())
         page.update()
 

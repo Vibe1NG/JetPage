@@ -2,6 +2,7 @@
   "order": [
     { "slug": "index", "title": "Overview" },
     { "slug": "content-authoring", "title": "Content Authoring" },
-    { "slug": "cross-linking", "title": "Cross-Document Links" }
+    { "slug": "cross-linking", "title": "Cross-Document Links" },
+    { "slug": "gherkin-example", "title": "BDD with Gherkin" }
   ]
 }

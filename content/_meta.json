@@ -17,6 +17,13 @@
       "description": "Configuration and API reference",
       "root": "reference",
       "color": "#7B68EE"
+    },
+    {
+      "id": "how-i-made-this",
+      "title": "How I Made This",
+      "description": "The story of how Claude built SiteGen",
+      "root": "how-i-made-this",
+      "color": "#2ECC71"
     }
   ],
   "nav": [
@@ -38,6 +45,12 @@
       "title": "Reference",
       "slug": "reference",
       "document": "reference"
+    },
+    {
+      "type": "section",
+      "title": "How I Made This",
+      "slug": "how-i-made-this",
+      "document": "how-i-made-this"
     }
   ]
 }
