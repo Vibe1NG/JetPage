@@ -13,9 +13,62 @@ Generate webistes with markdown content directory similar to Nextra but using Fl
 1. Application must use a Containerfile to run, with minimal/python hardened container from ironbank as the base image.
 
 ## Tools
-1. Python 3.12 
+1. Python 3.12
 1. Poetry - for python build and dependency management
-1. [Flet](https://flet.dev/) 
-1. PDF generation with Playwrite 
+1. [Flet](https://flet.dev/)
+1. PDF generation with Playwrite
 1. Podman - to run the images locally
+
+## Build
+
+Build the container image using Podman:
+
+```bash
+podman build -t sitegen -f Containerfile .
+```
+
+Or with the Makefile:
+
+```bash
+make build
+```
+
+This installs production dependencies via Poetry and downloads Playwright's Chromium browser (used for PDF export) inside the image.
+
+## Run
+
+**Local development** (requires Python 3.12 and Poetry):
+
+```bash
+poetry install
+poetry run python -m sitegen.main
+```
+
+Or with the Makefile:
+
+```bash
+make run
+```
+
+The app starts on `http://localhost:8080` by default.
+
+**From the container image:**
+
+```bash
+podman run -p 8080:8080 sitegen
+```
+
+To serve custom content, mount your content directory:
+
+```bash
+podman run -p 8080:8080 -v ./content:/app/content:ro sitegen
+```
+
+**Environment variables:**
+
+| Variable | Default | Description |
+|---|---|---|
+| `PORT` | `8080` | Port the web server listens on |
+| `HOST` | `0.0.0.0` | Bind address |
+| `CONTENT_DIR` | `/app/content` | Path to the markdown content directory |
 
