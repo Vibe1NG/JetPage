@@ -72,3 +72,56 @@ podman run -p 8080:8080 -v ./content:/app/content:ro sitegen
 | `HOST` | `0.0.0.0` | Bind address |
 | `CONTENT_DIR` | `/app/content` | Path to the markdown content directory |
 
+## Testing
+
+### Unit and BDD tests
+
+Runs pytest (unit/integration) and Behave (BDD feature files):
+
+```bash
+make test
+```
+
+Or individually:
+
+```bash
+# pytest only
+poetry run pytest tests/ -v --ignore=tests/e2e
+
+# Behave only
+poetry run behave features/
+```
+
+### End-to-end tests (Playwright)
+
+The e2e suite starts the SiteGen server automatically — no manual `make run` needed.
+
+Install the Chromium browser on first run:
+
+```bash
+poetry run playwright install chromium
+```
+
+Then run the tests:
+
+```bash
+make test-e2e
+```
+
+Or directly:
+
+```bash
+poetry run pytest tests/e2e/ -v
+```
+
+The suite opens one browser session shared across all tests (~70s total). It tests:
+
+- Flutter app shell renders (canvas, accessibility overlay)
+- All document tabs and sidebar nav items are present
+- Clicking sidebar links changes the page content
+- Switching document tabs changes the sidebar
+
+> **Note:** Flet's CanvasKit renderer draws everything to a `<canvas>` — text is
+> not in the DOM. Navigation is driven by clicking Flutter semantic nodes, and
+> content changes are verified by screenshot comparison.
+
