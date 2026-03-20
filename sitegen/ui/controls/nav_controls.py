@@ -4,12 +4,28 @@ import flet as ft
 
 from sitegen.core.navigation import PageLink
 
+# Design tokens
+_SECONDARY       = "#0057c0"
+_SECONDARY_DARK  = "#6daeff"
+
+# surface_container_high — raised card bg for prev/next
+_CARD_BG_LIGHT   = "#ebe7e7"
+_CARD_BG_DARK    = "#2b2b2b"
+
+_ON_SURFACE_VAR_LIGHT = "#414754"
+_ON_SURFACE_VAR_DARK  = "#b0b8c8"
+_ON_SURFACE_LIGHT     = "#1c1b1b"
+_ON_SURFACE_DARK      = "#e5e2e1"
+
 
 def build_breadcrumb(crumbs: list[PageLink], on_navigate, dark: bool = False) -> ft.Control:
-    text_color = ft.Colors.GREY_300 if dark else ft.Colors.GREY_600
-    sep_color = ft.Colors.GREY_500 if dark else ft.Colors.GREY_400
+    secondary   = _SECONDARY_DARK  if dark else _SECONDARY
+    label_color = _ON_SURFACE_VAR_DARK if dark else _ON_SURFACE_VAR_LIGHT
+    sep_color   = _ON_SURFACE_VAR_DARK if dark else "#9ca3af"
+
     if not crumbs:
         return ft.Container(height=0)
+
     controls = []
     for i, crumb in enumerate(crumbs):
         if i > 0:
@@ -20,9 +36,13 @@ def build_breadcrumb(crumbs: list[PageLink], on_navigate, dark: bool = False) ->
                 content=ft.Text(
                     crumb.title,
                     size=12,
-                    color=text_color if is_last else ft.Colors.BLUE_400,
+                    color=label_color if is_last else secondary,
+                    weight=ft.FontWeight.NORMAL,
                 ),
-                style=ft.ButtonStyle(padding=ft.padding.symmetric(horizontal=4, vertical=0)),
+                style=ft.ButtonStyle(
+                    padding=ft.padding.symmetric(horizontal=4, vertical=0),
+                    overlay_color=ft.Colors.with_opacity(0.06, secondary),
+                ),
                 on_click=(lambda _, s=crumb.slug: on_navigate(s)) if not is_last else None,
                 disabled=is_last,
             )
@@ -39,15 +59,17 @@ def build_prev_next_bar(
     on_navigate,
     dark: bool = False,
 ) -> ft.Control:
-    btn_color = ft.Colors.GREY_800 if dark else ft.Colors.GREY_100
-    text_color = ft.Colors.GREY_200 if dark else ft.Colors.GREY_800
+    card_bg     = _CARD_BG_DARK      if dark else _CARD_BG_LIGHT
+    text_color  = _ON_SURFACE_DARK   if dark else _ON_SURFACE_LIGHT
+    label_color = _ON_SURFACE_VAR_DARK if dark else _ON_SURFACE_VAR_LIGHT
+
     controls = []
     if prev:
         controls.append(
             ft.Container(
                 content=ft.Column(
                     controls=[
-                        ft.Text("← Previous", size=11, color=ft.Colors.GREY_500),
+                        ft.Text("← Previous", size=11, color=label_color),
                         ft.Text(
                             prev.title,
                             size=13,
@@ -58,7 +80,7 @@ def build_prev_next_bar(
                     spacing=2,
                     tight=True,
                 ),
-                bgcolor=btn_color,
+                bgcolor=card_bg,
                 border_radius=8,
                 padding=ft.padding.symmetric(horizontal=16, vertical=12),
                 on_click=lambda _, s=prev.slug: on_navigate(s),
@@ -75,7 +97,7 @@ def build_prev_next_bar(
                         ft.Text(
                             "Next →",
                             size=11,
-                            color=ft.Colors.GREY_500,
+                            color=label_color,
                             text_align=ft.TextAlign.RIGHT,
                         ),
                         ft.Text(
@@ -90,7 +112,7 @@ def build_prev_next_bar(
                     tight=True,
                     horizontal_alignment=ft.CrossAxisAlignment.END,
                 ),
-                bgcolor=btn_color,
+                bgcolor=card_bg,
                 border_radius=8,
                 padding=ft.padding.symmetric(horizontal=16, vertical=12),
                 on_click=lambda _, s=next_.slug: on_navigate(s),

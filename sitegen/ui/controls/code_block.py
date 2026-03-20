@@ -2,10 +2,16 @@
 
 import flet as ft
 
+# Design tokens
+_LIGHT_BG    = "#e5e2e1"   # surface_container_highest — "pops" off the surface page
+_DARK_BG     = "#2b2b2b"   # inverse_surface-ish — high contrast in dark mode
+_LABEL_LIGHT = "#6b7280"
+_LABEL_DARK  = "#8b929e"
+
 
 def build_code_block(language: str, code: str, page: ft.Page, dark: bool = False) -> ft.Control:
-    border_color = ft.Colors.GREY_700 if dark else ft.Colors.GREY_300
-    label_color = ft.Colors.GREY_500
+    bg_color    = _DARK_BG    if dark else _LIGHT_BG
+    label_color = _LABEL_DARK if dark else _LABEL_LIGHT
 
     def _copy(_e: ft.ControlEvent) -> None:
         async def _do_copy(text: str = code) -> None:
@@ -33,7 +39,7 @@ def build_code_block(language: str, code: str, page: ft.Page, dark: bool = False
     code_md = ft.Markdown(
         value=fence,
         extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
-        code_theme=ft.MarkdownCodeTheme.GITHUB,
+        code_theme=ft.MarkdownCodeTheme.GITHUB if not dark else ft.MarkdownCodeTheme.MONOKAI,
         selectable=True,
     )
 
@@ -46,8 +52,8 @@ def build_code_block(language: str, code: str, page: ft.Page, dark: bool = False
             spacing=0,
             tight=True,
         ),
-        border=ft.border.all(1, border_color),
+        bgcolor=bg_color,
         border_radius=8,
-        padding=ft.padding.only(left=8, right=8, top=8, bottom=0),
+        padding=ft.padding.only(left=12, right=8, top=8, bottom=8),
         margin=ft.margin.symmetric(vertical=8),
     )
