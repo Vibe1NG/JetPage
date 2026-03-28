@@ -22,20 +22,17 @@ from playwright.sync_api import Page
 from tests.e2e.conftest import NAV_SETTLE_MS, go_home
 
 # Document tabs always visible in the top bar regardless of active document
-DOCUMENT_TABS = ["User Guide", "Reference", "How I Made This"]
+DOCUMENT_TABS = ["User Guide", "Reference Library"]
 
-# Sidebar items present when the User Guide document is active
-SIDEBAR_ITEMS = [
-    "Home",
-    "GETTING STARTED",
-    "Overview",
-    "Installation",
-    "Configuration",
-    "GUIDES",
-    "Content Authoring",
-    "Cross-Document Links",
-    "BDD with Gherkin",
+# (button_text, description) — each click must produce a screenshot different from home
+NAVIGABLE_PAGES = [
+    ("Installation", "getting-started/installation"),
+    ("Configuration", "getting-started/configuration"),
+    ("Content Authoring", "guides/content-authoring"),
+    ("BDD with Gherkin", "guides/gherkin-example"),
+    ("Reference Library", "reference-library-dropdown"),
 ]
+
 
 # (button_text, description) — each click must produce a screenshot different from home
 NAVIGABLE_PAGES = [
@@ -109,13 +106,18 @@ def test_navigation_changes_content(app_page: Page, button_text: str, descriptio
     assert before != after, f"Page did not change after clicking {button_text!r} ({description})"
 
 
-def test_document_tab_changes_sidebar(app_page: Page) -> None:
-    """Switching to the Reference document tab must change the sidebar content."""
+def test_library_navigation_works(app_page: Page) -> None:
+    """Clicking a library dropdown and then a document link within it must navigate."""
     go_home(app_page)
     before = app_page.screenshot()
 
+    # 1. Click the library button to open the dropdown
+    _tappable(app_page).filter(has_text="Reference Library").first.click(force=True)
+    app_page.wait_for_timeout(NAV_SETTLE_MS)
+
+    # 2. Click the "Reference" link within the dropdown (it's now in the semantics tree)
     _tappable(app_page).filter(has_text="Reference").first.click(force=True)
     app_page.wait_for_timeout(NAV_SETTLE_MS)
 
     after = app_page.screenshot()
-    assert before != after, "Switching to Reference tab did not change the page"
+    assert before != after, "Navigating through library dropdown did not change the page"

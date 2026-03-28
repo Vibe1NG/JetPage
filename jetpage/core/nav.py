@@ -61,6 +61,23 @@ class Document:
 
 
 @dataclass
+class ToolbarItem:
+    """An item in the top toolbar, which can be a document link or a library dropdown.
+
+    Attributes:
+        type: The type of item: "document" or "library".
+        title: The display title for the item.
+        document_id: The ID of the document if type is "document".
+        items: A list of child ToolbarItems if type is "library".
+    """
+
+    type: str
+    title: str | None = None
+    document_id: str | None = None
+    items: list["ToolbarItem"] = field(default_factory=list)
+
+
+@dataclass
 class NavTree:
     """The complete navigation structure for the site.
 
@@ -68,11 +85,13 @@ class NavTree:
         site: Global site configuration.
         documents: List of all available documentation sets.
         nodes: Top-level navigation nodes.
+        toolbar: Items to display in the top toolbar.
     """
 
     site: dict
     documents: list[Document]
     nodes: list[NavNode]
+    toolbar: list[ToolbarItem] = field(default_factory=list)
 
     def find_document(self, doc_id: str) -> Document | None:
         return next((d for d in self.documents if d.id == doc_id), None)
@@ -161,7 +180,19 @@ def load_nav_tree(content_dir: Path) -> NavTree:
                 )
             )
 
-    return NavTree(site=site, documents=documents, nodes=nodes)
+    toolbar: list[ToolbarItem] = []
+    if "toolbar" in meta:
+
+        def _parse_toolbar_item(d: dict) -> ToolbarItem:
+            item_type = d.get("type")
+            title = d.get("title")
+            doc_id = d.get("id")
+            items = [_parse_toolbar_item(child) for child in d.get("items", [])]
+            return ToolbarItem(type=item_type, title=title, document_id=doc_id, items=items)
+
+        toolbar = [_parse_toolbar_item(item) for item in meta["toolbar"]]
+
+    return NavTree(site=site, documents=documents, nodes=nodes, toolbar=toolbar)
 
 
 def _load_section(effective_root: Path, section_slug: str, document_id: str | None) -> list[NavNode]:

@@ -24,10 +24,34 @@
       "description": "The story of how Claude built JetPage",
       "root": "how-i-made-this",
       "color": "#2ECC71"
+    },
+    {
+      "id": "api-reference",
+      "title": "API Reference",
+      "description": "Internal API documentation for developers",
+      "root": "api-reference",
+      "color": "#F39C12"
+    }
+  ],
+  "toolbar": [
+    { "type": "document", "id": "user-guide" },
+    {
+      "type": "library",
+      "title": "Reference Library",
+      "items": [
+        { "type": "document", "id": "reference" },
+        { "type": "document", "id": "how-i-made-this" },
+        {
+          "type": "library",
+          "title": "Technical Specs",
+          "items": [
+            { "type": "document", "id": "api-reference" }
+          ]
+        }
+      ]
     }
   ],
   "nav": [
-    { "type": "page", "slug": "index", "title": "Home" },
     {
       "type": "section",
       "title": "Getting Started",
@@ -51,6 +75,12 @@
       "title": "How I Made This",
       "slug": "how-i-made-this",
       "document": "how-i-made-this"
+    },
+    {
+      "type": "section",
+      "title": "API Reference",
+      "slug": "api-reference",
+      "document": "api-reference"
     }
   ]
 }

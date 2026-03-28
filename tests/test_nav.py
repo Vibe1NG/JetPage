@@ -10,22 +10,17 @@ def test_site_title(nav_tree):
 
 
 def test_documents_loaded(nav_tree):
-    assert len(nav_tree.documents) == 3
+    assert len(nav_tree.documents) == 4
     doc_ids = {d.id for d in nav_tree.documents}
     assert "user-guide" in doc_ids
     assert "reference" in doc_ids
     assert "how-i-made-this" in doc_ids
-
-
-def test_nav_contains_home_page(nav_tree):
-    home = next((n for n in nav_tree.nodes if n.slug == "index"), None)
-    assert home is not None
-    assert not home.is_section
+    assert "api-reference" in doc_ids
 
 
 def test_nav_sections_present(nav_tree):
     sections = [n for n in nav_tree.nodes if n.is_section]
-    assert len(sections) == 4
+    assert len(sections) == 5
 
 
 def test_section_children_populated(nav_tree):
@@ -49,3 +44,19 @@ def test_find_document(nav_tree):
 
 def test_find_document_missing_returns_none(nav_tree):
     assert nav_tree.find_document("nonexistent") is None
+
+
+def test_toolbar_loaded(nav_tree):
+    assert len(nav_tree.toolbar) == 2
+    assert nav_tree.toolbar[0].type == "document"
+    assert nav_tree.toolbar[0].document_id == "user-guide"
+    assert nav_tree.toolbar[1].type == "library"
+    assert nav_tree.toolbar[1].title == "Reference Library"
+    assert len(nav_tree.toolbar[1].items) == 3
+    # Check nested library
+    nested = nav_tree.toolbar[1].items[2]
+    assert nested.type == "library"
+    assert nested.title == "Technical Specs"
+    assert len(nested.items) == 1
+    assert nested.items[0].type == "document"
+    assert nested.items[0].document_id == "api-reference"

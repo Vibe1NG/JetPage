@@ -34,7 +34,7 @@ def build_app(page: ft.Page) -> None:
     page.title = nav_tree.site.get("title", "JetPage")
     _docs = nav_tree.documents
 
-    _state = {"dark": False, "slug": "index", "tab_index": 0}
+    _state = {"dark": False, "slug": "index"}
 
     # Design token palettes
     _LIGHT = {
@@ -125,20 +125,155 @@ def build_app(page: ft.Page) -> None:
             shape=ft.RoundedRectangleBorder(radius=6),
         )
 
-    def _make_tab_buttons() -> list[ft.Control]:
-        return [
-            ft.TextButton(
-                content=ft.Text(
-                    doc.title,
-                    weight=ft.FontWeight.W_500 if i == _state["tab_index"] else ft.FontWeight.NORMAL,
-                ),
-                style=_tab_style(i == _state["tab_index"]),
-                on_click=lambda _, idx=i: on_tab_click(idx),
-            )
-            for i, doc in enumerate(_docs)
-        ]
+    def _make_toolbar() -> ft.Control:
+        def build_flat_tree(items, depth=0):
+            """Builds a flat list of PopupMenuItems with indentation and visual lines."""
+            flat = []
+            for item in items:
+                # Vertical line indicator for indentation
+                # We use a vertical divider in a Row for visual nesting
+                def indent_box(d):
+                    if d == 0:
+                        return ft.Container(width=4)
+                    return ft.Row(
+                        [
+                            ft.Container(
+                                width=1,
+                                height=20,
+                                bgcolor=ft.Colors.with_opacity(0.15, _tok()["topbar_text"]),
+                            ),
+                            ft.Container(width=15),
+                        ]
+                        * d,
+                        spacing=0,
+                        tight=True,
+                    )
 
-    doc_tab_row = ft.Row(controls=_make_tab_buttons(), spacing=2)
+                if item.type == "document":
+                    doc = nav_tree.find_document(item.document_id)
+                    if not doc:
+                        continue
+                    active = _state["slug"].startswith(doc.root)
+                    flat.append(
+                        ft.PopupMenuItem(
+                            content=ft.Row(
+                                [
+                                    indent_box(depth),
+                                    ft.Icon(
+                                        ft.Icons.DESCRIPTION_OUTLINED,
+                                        size=16,
+                                        color=_tok()["tab_active"] if active else _tok()["tab_inactive"],
+                                    ),
+                                    ft.Container(width=8),
+                                    ft.Text(
+                                        item.title or doc.title,
+                                        size=13,
+                                        weight=ft.FontWeight.W_500 if active else ft.FontWeight.NORMAL,
+                                        color=_tok()["tab_active"] if active else _tok()["tab_inactive"],
+                                    ),
+                                ],
+                                spacing=0,
+                                tight=True,
+                            ),
+                            on_click=lambda _, root=doc.root: navigate(root),
+                        )
+                    )
+                elif item.type == "library":
+                    # Non-clickable header for nested libraries
+                    flat.append(
+                        ft.PopupMenuItem(
+                            content=ft.Row(
+                                [
+                                    indent_box(depth),
+                                    ft.Icon(
+                                        ft.Icons.FOLDER_OPEN_OUTLINED,
+                                        size=16,
+                                        color=ft.Colors.with_opacity(0.5, _tok()["topbar_text"]),
+                                    ),
+                                    ft.Container(width=8),
+                                    ft.Text(
+                                        (item.title or "Library").upper(),
+                                        size=11,
+                                        weight=ft.FontWeight.BOLD,
+                                        color=ft.Colors.with_opacity(0.5, _tok()["topbar_text"]),
+                                    ),
+                                ],
+                                spacing=0,
+                                tight=True,
+                            ),
+                            disabled=True,
+                        )
+                    )
+                    flat.extend(build_flat_tree(item.items, depth + 1))
+            return flat
+
+        def create_library_dropdown(library_item):
+            # Check if any descendant is active
+            def is_descendant_active(lib):
+                for sub in lib.items:
+                    if sub.type == "document":
+                        doc = nav_tree.find_document(sub.document_id)
+                        if doc and _state["slug"].startswith(doc.root):
+                            return True
+                    elif sub.type == "library" and is_descendant_active(sub):
+                        return True
+                return False
+
+            active = is_descendant_active(library_item)
+
+            # In Flet 0.82.2, we use PopupMenuButton
+            return ft.PopupMenuButton(
+                content=ft.Container(
+                    content=ft.Row(
+                        [
+                            ft.Text(
+                                library_item.title or "Library",
+                                weight=ft.FontWeight.W_500 if active else ft.FontWeight.NORMAL,
+                                color=_tok()["tab_active"] if active else _tok()["tab_inactive"],
+                            ),
+                            ft.Icon(
+                                ft.Icons.KEYBOARD_ARROW_DOWN,
+                                size=16,
+                                color=_tok()["tab_active"] if active else _tok()["tab_inactive"],
+                            ),
+                        ],
+                        spacing=4,
+                        tight=True,
+                    ),
+                    padding=ft.padding.symmetric(horizontal=12, vertical=6),
+                    border_radius=ft.border_radius.all(6),
+                    # Replicate _tab_style-like behavior for the container
+                ),
+                items=build_flat_tree(library_item.items),
+                tooltip=library_item.title or "Open Library",
+            )
+
+        toolbar_controls = []
+        for item in nav_tree.toolbar:
+            if item.type == "document":
+                doc = nav_tree.find_document(item.document_id)
+                if not doc:
+                    continue
+                active = _state["slug"].startswith(doc.root)
+                toolbar_controls.append(
+                    ft.TextButton(
+                        content=ft.Text(
+                            item.title or doc.title,
+                            weight=ft.FontWeight.W_500 if active else ft.FontWeight.NORMAL,
+                        ),
+                        style=_tab_style(active),
+                        on_click=lambda _, root=doc.root: navigate(root),
+                    )
+                )
+            elif item.type == "library":
+                toolbar_controls.append(create_library_dropdown(item))
+
+        if not toolbar_controls:
+            return ft.Container()
+
+        return ft.Row(controls=toolbar_controls, spacing=4)
+
+    toolbar_container = ft.Container(content=_make_toolbar())
 
     _logo_text = ft.Text(
         nav_tree.site.get("title", "JetPage"),
@@ -150,17 +285,23 @@ def build_app(page: ft.Page) -> None:
     top_bar = ft.Container(
         content=ft.Row(
             controls=[
-                ft.Row(
-                    controls=[
-                        ft.Image(src="/jetpage-logo.svg", height=20),
-                        ft.Container(width=6),
-                        _logo_text,
-                    ],
-                    spacing=0,
-                    vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                ft.Container(
+                    content=ft.Row(
+                        controls=[
+                            ft.Image(src="/jetpage-logo.svg", height=20),
+                            ft.Container(width=6),
+                            _logo_text,
+                        ],
+                        spacing=0,
+                        vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                    ),
+                    on_click=lambda _: navigate("index"),
+                    ink=True,
+                    padding=ft.padding.all(4),
+                    border_radius=ft.border_radius.all(8),
                 ),
                 ft.Container(width=24),
-                doc_tab_row if _docs else ft.Container(),
+                toolbar_container,
                 ft.Container(expand=True),
                 export_spinner,
                 download_btn,
@@ -207,29 +348,24 @@ def build_app(page: ft.Page) -> None:
         page.go(f"/{slug}")
 
     def _current_doc():
-        idx = _state["tab_index"]
-        return _docs[idx] if _docs and idx < len(_docs) else None
+        return get_document_for_slug(_state["slug"], nav_tree)
 
-    def _rebuild_doc_tabs() -> None:
-        doc_tab_row.controls = _make_tab_buttons()
+    def _rebuild_toolbar() -> None:
+        toolbar_container.content = _make_toolbar()
 
-    def _update_doc_tab(slug: str) -> None:
-        if not _docs:
-            return
-        doc = get_document_for_slug(slug, nav_tree)
-        if doc:
-            try:
-                _state["tab_index"] = _docs.index(doc)
-                _rebuild_doc_tabs()
-            except ValueError:
-                pass
+    def _update_toolbar(_slug: str) -> None:
+        _rebuild_toolbar()
 
     def _rebuild_sidebar() -> None:
         doc = _current_doc()
         doc_id = doc.id if doc else None
-        sidebar_container.content = build_sidebar(
-            nav_tree, _state["slug"], navigate, dark=_state["dark"], active_doc_id=doc_id
-        ).content
+        sidebar_panel = build_sidebar(nav_tree, _state["slug"], navigate, dark=_state["dark"], active_doc_id=doc_id)
+        sidebar_container.content = sidebar_panel.content
+        # Hide sidebar entirely on home page (no doc_id and no independent pages)
+        # Check if the sidebar actually has content controls besides padding/styling
+        has_items = len(sidebar_panel.content.controls) > 0
+        sidebar_container.width = 240 if has_items else 0
+        sidebar_container.visible = has_items
 
     def _rebuild_toc(toc_tokens: list[dict]) -> None:
         def _on_anchor(anchor_id: str) -> None:
@@ -269,7 +405,7 @@ def build_app(page: ft.Page) -> None:
         dark_btn.icon_color = tok["topbar_icon"]
         dark_btn.style = btn_style
         export_spinner.color = tok["spinner"]
-        doc_tab_row.controls = _make_tab_buttons()
+        _rebuild_toolbar()
 
     def on_dark_toggle(_e: Any) -> None:
         _state["dark"] = not _state["dark"]
@@ -348,12 +484,6 @@ def build_app(page: ft.Page) -> None:
         page.open(dialog)  # type: ignore
 
     search_btn.on_click = on_search_click
-
-    # --- Document tabs ---
-
-    def on_tab_click(idx: int) -> None:
-        if 0 <= idx < len(_docs):
-            navigate(_docs[idx].root)
 
     # --- PDF export ---
 
@@ -498,7 +628,7 @@ def build_app(page: ft.Page) -> None:
             )
             _rebuild_toc([])
 
-        _update_doc_tab(slug)
+        _update_toolbar(slug)
         _rebuild_sidebar()
         _rebuild_nav_controls(slug)
         download_btn.visible = bool(_current_doc())

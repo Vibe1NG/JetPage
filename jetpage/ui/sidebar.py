@@ -18,13 +18,22 @@ def build_sidebar(
 
     for node in nav_tree.nodes:
         if node.is_section:
-            if active_doc_id and node.document_id != active_doc_id:
-                continue
+            # If an active_doc_id is provided, only show sections belonging to that document.
+            # If NO active_doc_id is provided (e.g. on home page), hide all document-linked sections.
+            if active_doc_id:
+                if node.document_id != active_doc_id:
+                    continue
+            else:
+                # Home page or non-document page: only show sections NOT tied to any document
+                if node.document_id:
+                    continue
             items.append(_section_header(node, colors))
             for child in node.children:
                 items.append(_page_item(child.title, child.slug, active_slug, on_navigate, colors, indent=True))
         else:
-            items.append(_page_item(node.title, node.slug, active_slug, on_navigate, colors, indent=False))
+            # Top-level pages: only show if no document is active
+            if not active_doc_id:
+                items.append(_page_item(node.title, node.slug, active_slug, on_navigate, colors, indent=False))
 
     return ft.Container(
         content=ft.Column(
