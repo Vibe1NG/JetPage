@@ -1,4 +1,7 @@
-# SiteGen
+# JetPage
+
+![logo](jetpage-logo.svg)
+
 Generate webistes with markdown content directory similar to Nextra but using Flet
 
 ## Goal
@@ -14,7 +17,7 @@ Generate webistes with markdown content directory similar to Nextra but using Fl
 
 ## Tools
 1. Python 3.12
-1. Poetry - for python build and dependency management
+1. [uv](https://docs.astral.sh/uv/) - for python build and dependency management
 1. [Flet](https://flet.dev/)
 1. PDF generation with Playwrite
 1. Podman - to run the images locally
@@ -24,7 +27,7 @@ Generate webistes with markdown content directory similar to Nextra but using Fl
 Build the container image using Podman:
 
 ```bash
-podman build -t sitegen -f Containerfile .
+podman build -t jetpage -f Containerfile .
 ```
 
 Or with the Makefile:
@@ -33,15 +36,15 @@ Or with the Makefile:
 make build
 ```
 
-This installs production dependencies via Poetry and downloads Playwright's Chromium browser (used for PDF export) inside the image.
+This installs production dependencies via uv and downloads Playwright's Chromium browser (used for PDF export) inside the image.
 
 ## Run
 
-**Local development** (requires Python 3.12 and Poetry):
+**Local development** (requires Python 3.12 and uv):
 
 ```bash
-poetry install
-poetry run python -m sitegen.main
+uv sync
+uv run python -m jetpage.main
 ```
 
 Or with the Makefile:
@@ -55,13 +58,13 @@ The app starts on `http://localhost:8080` by default.
 **From the container image:**
 
 ```bash
-podman run -p 8080:8080 sitegen
+podman run -p 8080:8080 jetpage
 ```
 
 To serve custom content, mount your content directory:
 
 ```bash
-podman run -p 8080:8080 -v ./content:/app/content:ro sitegen
+podman run -p 8080:8080 -v ./content:/app/content:ro jetpage
 ```
 
 **Environment variables:**
@@ -86,20 +89,20 @@ Or individually:
 
 ```bash
 # pytest only
-poetry run pytest tests/ -v --ignore=tests/e2e
+uv run pytest tests/ -v --ignore=tests/e2e
 
 # Behave only
-poetry run behave features/
+uv run behave features/
 ```
 
 ### End-to-end tests (Playwright)
 
-The e2e suite starts the SiteGen server automatically — no manual `make run` needed.
+The e2e suite starts the JetPage server automatically — no manual `make run` needed.
 
 Install the Chromium browser on first run:
 
 ```bash
-poetry run playwright install chromium
+uv run playwright install chromium
 ```
 
 Then run the tests:
@@ -111,7 +114,7 @@ make test-e2e
 Or directly:
 
 ```bash
-poetry run pytest tests/e2e/ -v
+uv run pytest tests/e2e/ -v
 ```
 
 The suite opens one browser session shared across all tests (~70s total). It tests:
@@ -124,4 +127,3 @@ The suite opens one browser session shared across all tests (~70s total). It tes
 > **Note:** Flet's CanvasKit renderer draws everything to a `<canvas>` — text is
 > not in the DOM. Navigation is driven by clicking Flutter semantic nodes, and
 > content changes are verified by screenshot comparison.
-

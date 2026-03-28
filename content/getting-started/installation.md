@@ -3,21 +3,21 @@
 ## Requirements
 
 - Python 3.12+
-- Poetry 2.x
+- [uv](https://docs.astral.sh/uv/)
 - Podman (for container deployment)
 
-## Install with Poetry
+## Install with uv
 
 ```bash
-git clone https://github.com/your-org/sitegen.git
-cd sitegen
-poetry install
+git clone https://github.com/your-org/jetpage.git
+cd jetpage
+uv sync
 ```
 
 ## Run the dev server
 
 ```bash
-poetry run python -m sitegen.main
+uv run python -m jetpage.main
 ```
 
 Open `http://localhost:8080` in your browser.

@@ -2,7 +2,7 @@ import re
 
 from behave import given, then, when
 
-from sitegen.content.parser import parse
+from jetpage.content.parser import parse
 
 
 def _has_css_class(html: str, cls: str) -> bool:

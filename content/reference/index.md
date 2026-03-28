@@ -1,6 +1,6 @@
 # Reference
 
-Complete reference documentation for SiteGen configuration.
+Complete reference documentation for JetPage configuration.
 
 ## Sections
 

@@ -32,13 +32,13 @@ class _Handler(http.server.BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
 
-    def log_message(self, *args) -> None:  # suppress access logs
+    def log_message(self, format: str, *args) -> None:  # suppress access logs
         pass
 
 
 class PdfServer:
     def __init__(self) -> None:
-        self._temp_dir = Path(tempfile.mkdtemp(prefix="sitegen_pdf_"))
+        self._temp_dir = Path(tempfile.mkdtemp(prefix="jetpage_pdf_"))
         self._port: int | None = None
 
     def start(self) -> None:

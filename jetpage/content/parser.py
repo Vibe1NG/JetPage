@@ -1,6 +1,6 @@
 import markdown
 
-from sitegen.content.extensions.math import protect_latex, restore_latex
+from jetpage.content.extensions.math import protect_latex, restore_latex
 
 _EXTENSIONS = [
     "pymdownx.highlight",  # Pygments syntax highlighting for code blocks
@@ -48,4 +48,5 @@ def parse_with_toc(markdown_str: str) -> tuple[str, list[dict]]:
     md = _make_md()
     html = md.convert(protected)
     html = restore_latex(html, store)
-    return html, md.toc_tokens
+    toc_tokens = getattr(md, "toc_tokens", [])
+    return html, toc_tokens

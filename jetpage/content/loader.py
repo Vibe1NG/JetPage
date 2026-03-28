@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from sitegen.content.image_processor import embed_images
+from jetpage.content.image_processor import embed_images
 
 
 def load_page(path: Path | str) -> str:

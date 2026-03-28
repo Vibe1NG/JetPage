@@ -1,6 +1,6 @@
 # Build Phases
 
-SiteGen was assembled in seven discrete phases. Each phase added a slice of
+JetPage was assembled in seven discrete phases. Each phase added a slice of
 functionality, was tested, and was merged before the next began. This
 incremental approach kept each Claude response focused and manageable.
 
@@ -8,7 +8,7 @@ incremental approach kept each Claude response focused and manageable.
 
 | Phase | Name | Key deliverables |
 |-------|------|-----------------|
-| 1 | Project skeleton | `pyproject.toml`, Poetry setup, `sitegen/main.py`, stub modules |
+| 1 | Project skeleton | `pyproject.toml`, Poetry setup, `jetpage/main.py`, stub modules |
 | 2 | Navigation tree | `_meta.json` loader, `NavTree`/`NavNode`/`Document` dataclasses, sidebar |
 | 3 | Markdown rendering + BDD tests | `parser.py`, `cache.py`, `ft.Markdown` display, Behave feature files |
 | 4 | Syntax highlighting + LaTeX math | Pygments via pymdownx, `latex_scale_factor`, math protection extension |
@@ -21,7 +21,7 @@ incremental approach kept each Claude response focused and manageable.
 **Phase 1 — Project Skeleton.** Claude generated the Poetry `pyproject.toml`
 with all required dependencies (`flet`, `markdown`, `pymdown-extensions`,
 `pygments`, `playwright`, `pypdf`, `behave`), created the package hierarchy
-under `sitegen/`, and wired a minimal `main.py` that launches a blank Flet
+under `jetpage/`, and wired a minimal `main.py` that launches a blank Flet
 window.
 
 **Phase 2 — Navigation Tree.** The `_meta.json` convention was designed here:

@@ -7,7 +7,7 @@ The cache is process-scoped; in DEV_MODE the mtime check picks up edits automati
 from dataclasses import dataclass
 from pathlib import Path
 
-from sitegen.content.parser import parse_with_toc
+from jetpage.content.parser import parse_with_toc
 
 
 @dataclass(frozen=True)

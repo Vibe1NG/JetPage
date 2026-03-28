@@ -1,10 +1,10 @@
 # Architecture
 
-SiteGen is organised into four top-level packages under `sitegen/`:
+JetPage is organised into four top-level packages under `jetpage/`:
 
 ## Module Structure
 
-**`sitegen/core/`** — domain logic with no UI dependency.
+**`jetpage/core/`** — domain logic with no UI dependency.
 
 - `nav.py` — loads `_meta.json` files and builds the `NavTree` (documents,
   sections, and leaf pages as `NavNode` objects).
@@ -14,7 +14,7 @@ SiteGen is organised into four top-level packages under `sitegen/`:
 - `search.py` — full-text search across all content files.
 - `navigation.py` — prev/next page and breadcrumb helpers.
 
-**`sitegen/content/`** — Markdown processing pipeline.
+**`jetpage/content/`** — Markdown processing pipeline.
 
 - `loader.py` — reads raw Markdown from disk and embeds images as base64 data
   URIs so they survive both the Flet viewer and Playwright PDF rendering.
@@ -25,7 +25,7 @@ SiteGen is organised into four top-level packages under `sitegen/`:
 - `code_splitter.py` — splits a Markdown document into alternating text and
   fenced-code segments so the UI can render code blocks with a copy button.
 
-**`sitegen/ui/`** — the Flet application shell and reusable controls.
+**`jetpage/ui/`** — the Flet application shell and reusable controls.
 
 - `app_shell.py` — the top-level `build_app` function; wires together the
   top bar, sidebar, content area, and TOC panel.
@@ -34,7 +34,7 @@ SiteGen is organised into four top-level packages under `sitegen/`:
 - `controls/nav_controls.py` — breadcrumb strip and prev/next bar.
 - `controls/code_block.py` — syntax-coloured code block with copy button.
 
-**`sitegen/export/`** — PDF generation.
+**`jetpage/export/`** — PDF generation.
 
 - `pdf_exporter.py` — orchestrates Playwright-based HTML-to-PDF rendering,
   then uses pypdf to stitch pages and inject bookmarks plus a title page and
@@ -50,12 +50,12 @@ widget toolkit from pure Python. It supports async patterns, dark mode via
 browser target.
 
 **Why python-markdown + Pygments?** python-markdown is extensible and has a
-stable `toc` extension that exposes `toc_tokens`, which SiteGen uses to build
+stable `toc` extension that exposes `toc_tokens`, which JetPage uses to build
 the in-page TOC panel. Pygments provides accurate, theme-able syntax
 highlighting for both the HTML export path and the PDF.
 
 **Why Playwright for PDF?** Flet renders to a Flutter canvas; there is no
 `page.run_javascript` or `ft.Html` widget to hook into directly. Instead,
-SiteGen re-renders each page as standalone HTML (using the same python-markdown
+JetPage re-renders each page as standalone HTML (using the same python-markdown
 pipeline), then asks Playwright's headless Chromium to print it to PDF. The
 result is a fully text-searchable PDF rather than a rasterised screenshot.

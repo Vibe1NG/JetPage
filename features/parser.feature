@@ -56,9 +56,9 @@ Feature: Markdown parsing
     And the output contains "<code"
 
   Scenario: Inline code renders as code element
-    Given the markdown "Run `poetry install` to install"
+    Given the markdown "Run `uv sync` to install"
     When it is parsed
-    Then the output contains "<code>poetry install</code>"
+    Then the output contains "<code>uv sync</code>"
 
   # --- Links ---
 

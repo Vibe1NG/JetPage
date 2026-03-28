@@ -1,4 +1,4 @@
-from sitegen.core.document import get_document_for_slug, get_pages_for_document
+from jetpage.core.document import get_document_for_slug, get_pages_for_document
 
 
 def test_get_pages_for_document_user_guide(nav_tree):

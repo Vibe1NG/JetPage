@@ -1,14 +1,14 @@
 # How I Made This
 
-SiteGen is a Python-based documentation site generator with a built-in viewer,
+JetPage is a Python-based documentation site generator with a built-in viewer,
 PDF export, full-text search, and dark mode. What makes it unusual is that it
 was built entirely by **Claude** — an AI assistant made by Anthropic — through a
 series of conversational prompts, without a human writing a single line of code
 directly.
 
-## What Is SiteGen?
+## What Is JetPage?
 
-SiteGen turns a directory of Markdown files (organised with `_meta.json`
+JetPage turns a directory of Markdown files (organised with `_meta.json`
 sidecar files) into a navigable documentation site. It provides:
 
 - A **three-column layout** — navigation sidebar, content area, and an

@@ -1,4 +1,4 @@
-from sitegen.content.extensions.math import protect_latex, restore_latex
+from jetpage.content.extensions.math import protect_latex, restore_latex
 
 
 def test_inline_math_removed_from_text():

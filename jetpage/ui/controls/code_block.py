@@ -1,19 +1,21 @@
 """Custom code block widget with copy-to-clipboard button."""
 
+from typing import Any
+
 import flet as ft
 
 # Design tokens
-_LIGHT_BG    = "#e5e2e1"   # surface_container_highest — "pops" off the surface page
-_DARK_BG     = "#2b2b2b"   # inverse_surface-ish — high contrast in dark mode
+_LIGHT_BG = "#e5e2e1"  # surface_container_highest — "pops" off the surface page
+_DARK_BG = "#2b2b2b"  # inverse_surface-ish — high contrast in dark mode
 _LABEL_LIGHT = "#6b7280"
-_LABEL_DARK  = "#8b929e"
+_LABEL_DARK = "#8b929e"
 
 
 def build_code_block(language: str, code: str, page: ft.Page, dark: bool = False) -> ft.Control:
-    bg_color    = _DARK_BG    if dark else _LIGHT_BG
+    bg_color = _DARK_BG if dark else _LIGHT_BG
     label_color = _LABEL_DARK if dark else _LABEL_LIGHT
 
-    def _copy(_e: ft.ControlEvent) -> None:
+    def _copy(_e: Any) -> None:
         async def _do_copy(text: str = code) -> None:
             await ft.Clipboard().set(text)
 

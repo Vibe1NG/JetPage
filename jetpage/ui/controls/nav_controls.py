@@ -2,26 +2,26 @@
 
 import flet as ft
 
-from sitegen.core.navigation import PageLink
+from jetpage.core.navigation import PageLink
 
 # Design tokens
-_SECONDARY       = "#0057c0"
-_SECONDARY_DARK  = "#6daeff"
+_SECONDARY = "#0057c0"
+_SECONDARY_DARK = "#6daeff"
 
 # surface_container_high — raised card bg for prev/next
-_CARD_BG_LIGHT   = "#ebe7e7"
-_CARD_BG_DARK    = "#2b2b2b"
+_CARD_BG_LIGHT = "#ebe7e7"
+_CARD_BG_DARK = "#2b2b2b"
 
 _ON_SURFACE_VAR_LIGHT = "#414754"
-_ON_SURFACE_VAR_DARK  = "#b0b8c8"
-_ON_SURFACE_LIGHT     = "#1c1b1b"
-_ON_SURFACE_DARK      = "#e5e2e1"
+_ON_SURFACE_VAR_DARK = "#b0b8c8"
+_ON_SURFACE_LIGHT = "#1c1b1b"
+_ON_SURFACE_DARK = "#e5e2e1"
 
 
 def build_breadcrumb(crumbs: list[PageLink], on_navigate, dark: bool = False) -> ft.Control:
-    secondary   = _SECONDARY_DARK  if dark else _SECONDARY
+    secondary = _SECONDARY_DARK if dark else _SECONDARY
     label_color = _ON_SURFACE_VAR_DARK if dark else _ON_SURFACE_VAR_LIGHT
-    sep_color   = _ON_SURFACE_VAR_DARK if dark else "#9ca3af"
+    sep_color = _ON_SURFACE_VAR_DARK if dark else "#9ca3af"
 
     if not crumbs:
         return ft.Container(height=0)
@@ -59,8 +59,8 @@ def build_prev_next_bar(
     on_navigate,
     dark: bool = False,
 ) -> ft.Control:
-    card_bg     = _CARD_BG_DARK      if dark else _CARD_BG_LIGHT
-    text_color  = _ON_SURFACE_DARK   if dark else _ON_SURFACE_LIGHT
+    card_bg = _CARD_BG_DARK if dark else _CARD_BG_LIGHT
+    text_color = _ON_SURFACE_DARK if dark else _ON_SURFACE_LIGHT
     label_color = _ON_SURFACE_VAR_DARK if dark else _ON_SURFACE_VAR_LIGHT
 
     controls = []

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from sitegen.core.nav import load_nav_tree
+from jetpage.core.nav import load_nav_tree
 
 CONTENT_DIR = Path(__file__).parent.parent / "content"
 

@@ -1,22 +1,20 @@
 FROM python:3.12-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    POETRY_VERSION=2.2.1 \
-    POETRY_VIRTUALENVS_IN_PROJECT=true \
-    POETRY_NO_INTERACTION=1
+    UV_COMPILE_BYTECODE=1
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir "poetry==$POETRY_VERSION"
+COPY pyproject.toml uv.lock README.md ./
+RUN uv sync --frozen --no-dev --no-install-project
 
-COPY pyproject.toml poetry.lock ./
-RUN poetry install --only main --no-root
+COPY jetpage/ ./jetpage/
 
 # Install Playwright's Chromium browser and its OS dependencies
-RUN poetry run playwright install --with-deps chromium
+RUN uv run playwright install --with-deps chromium
 
-COPY sitegen/ ./sitegen/
 COPY content/ ./content/
 
 ENV PORT=8080 \
@@ -25,4 +23,4 @@ ENV PORT=8080 \
 
 EXPOSE 8080
 
-CMD ["poetry", "run", "python", "-m", "sitegen.main"]
+CMD ["uv", "run", "jetpage"]

@@ -1,6 +1,6 @@
 # Guides
 
-This section covers how to author content and configure your SiteGen site.
+This section covers how to author content and configure your JetPage site.
 
 ## In this section
 

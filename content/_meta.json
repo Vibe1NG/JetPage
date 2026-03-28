@@ -1,7 +1,7 @@
 {
   "site": {
-    "title": "SiteGen Docs",
-    "description": "Documentation for the SiteGen project"
+    "title": "JetPage Docs",
+    "description": "Documentation for the JetPage project"
   },
   "documents": [
     {
@@ -21,7 +21,7 @@
     {
       "id": "how-i-made-this",
       "title": "How I Made This",
-      "description": "The story of how Claude built SiteGen",
+      "description": "The story of how Claude built JetPage",
       "root": "how-i-made-this",
       "color": "#2ECC71"
     }

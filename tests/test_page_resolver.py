@@ -1,4 +1,4 @@
-from sitegen.core.page_resolver import resolve
+from jetpage.core.page_resolver import resolve
 
 
 def test_resolve_index(content_dir):

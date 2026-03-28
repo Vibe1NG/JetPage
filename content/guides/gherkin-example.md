@@ -1,6 +1,6 @@
 # BDD with Gherkin
 
-SiteGen's tests are written using **Behaviour-Driven Development (BDD)** with
+JetPage's tests are written using **Behaviour-Driven Development (BDD)** with
 the Gherkin syntax. Gherkin is a plain-English specification language that
 doubles as executable test code via the [Behave](https://behave.readthedocs.io/)
 framework.
@@ -44,7 +44,7 @@ Feature: Navigation tree loading
 from pathlib import Path
 import pytest
 from behave import given, when, then
-from sitegen.core.nav import load_nav_tree
+from jetpage.core.nav import load_nav_tree
 
 
 @given("a content directory with a valid _meta.json")
@@ -81,7 +81,7 @@ def step_check_children(context):
 ## Running the Tests
 
 ```bash
-poetry run behave features/
+uv run behave features/
 ```
 
 Behave discovers all `.feature` files under `features/`, matches each step to a

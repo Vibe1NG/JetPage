@@ -1,4 +1,4 @@
-from sitegen.core.nav import NavTree
+from jetpage.core.nav import NavTree
 
 
 def test_load_nav_tree_returns_nav_tree(nav_tree):
@@ -6,7 +6,7 @@ def test_load_nav_tree_returns_nav_tree(nav_tree):
 
 
 def test_site_title(nav_tree):
-    assert nav_tree.site["title"] == "SiteGen Docs"
+    assert nav_tree.site["title"] == "JetPage Docs"
 
 
 def test_documents_loaded(nav_tree):

@@ -1,4 +1,4 @@
-"""Session-scoped fixtures that start the SiteGen app and wire up pytest-playwright.
+"""Session-scoped fixtures that start the JetPage app and wire up pytest-playwright.
 
 Key constraint: Flet/Flutter CanvasKit renderer does NOT respond to direct hash-URL
 navigation in Playwright (all routes render the home page). The only reliable way to
@@ -37,7 +37,7 @@ def _wait_for_port(port: int, timeout: float = 30.0) -> None:
                 return
         except OSError:
             time.sleep(0.5)
-    raise TimeoutError(f"SiteGen did not start on port {port} within {timeout}s")
+    raise TimeoutError(f"JetPage did not start on port {port} within {timeout}s")
 
 
 @pytest.fixture(scope="session")
@@ -47,7 +47,7 @@ def app_port() -> int:
 
 @pytest.fixture(scope="session")
 def app_server(app_port: int):
-    """Launch the SiteGen web server for the test session and shut it down afterwards."""
+    """Launch the JetPage web server for the test session and shut it down afterwards."""
     env = {
         **os.environ,
         "PORT": str(app_port),
@@ -55,7 +55,7 @@ def app_server(app_port: int):
         "CONTENT_DIR": os.path.join(PROJECT_ROOT, "content"),
     }
     proc = subprocess.Popen(
-        ["poetry", "run", "python", "-m", "sitegen.main"],
+        ["uv", "run", "python", "-m", "jetpage.main"],
         cwd=PROJECT_ROOT,
         env=env,
         stdout=subprocess.PIPE,
@@ -72,7 +72,7 @@ def app_server(app_port: int):
 
 
 @pytest.fixture(scope="session")
-def base_url(app_server, app_port: int) -> str:  # noqa: ARG001
+def base_url(app_server, app_port: int) -> str:
     """Override pytest-playwright's base_url with the live server address."""
     return f"http://127.0.0.1:{app_port}"
 

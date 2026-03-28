@@ -1,6 +1,6 @@
 # Challenges & Solutions
 
-Building SiteGen surfaced several non-obvious problems. Here are the five most
+Building JetPage surfaced several non-obvious problems. Here are the five most
 significant, and how they were resolved.
 
 ## 1. Flet 0.82.2 API Breaking Changes
@@ -65,5 +65,5 @@ structure.
 
 ## Getting Started
 
-Ready to try SiteGen yourself? See the [Getting Started guide](/getting-started)
+Ready to try JetPage yourself? See the [Getting Started guide](/getting-started)
 to install and run it.

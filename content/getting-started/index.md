@@ -1,17 +1,17 @@
 # Getting Started
 
-This section covers how to install and configure SiteGen.
+This section covers how to install and configure JetPage.
 
 ## Overview
 
-![SiteGen 3-column layout](./sitegen-overview.svg)
+![JetPage 3-column layout](./jetpage-overview.svg)
 
-SiteGen presents your documentation in a clean 3-column layout: navigation sidebar on the left, content in the centre, and an "On This Page" TOC panel on the right.
+JetPage presents your documentation in a clean 3-column layout: navigation sidebar on the left, content in the centre, and an "On This Page" TOC panel on the right.
 
 ## Prerequisites
 
 - Python 3.12
-- Poetry
+- [uv](https://docs.astral.sh/uv/)
 - Podman (for container-based deployment)
 
 ## Installation
@@ -19,15 +19,15 @@ SiteGen presents your documentation in a clean 3-column layout: navigation sideb
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/your-org/sitegen.git
-cd sitegen
-poetry install
+git clone https://github.com/your-org/jetpage.git
+cd jetpage
+uv sync
 ```
 
 ## Running Locally
 
 ```bash
-poetry run python -m sitegen.main
+uv run python -m jetpage.main
 ```
 
 Then open your browser at `http://localhost:8080`.

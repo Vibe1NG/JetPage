@@ -1,4 +1,4 @@
-from sitegen.core.search import search
+from jetpage.core.search import search
 
 
 def test_search_finds_matching_page(content_dir, nav_tree):

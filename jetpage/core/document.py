@@ -1,6 +1,6 @@
 """Document-level helpers: page enumeration and slug-to-document lookup."""
 
-from sitegen.core.nav import Document, NavNode, NavTree
+from jetpage.core.nav import Document, NavNode, NavTree
 
 
 def get_pages_for_document(doc: Document, nav_tree: NavTree) -> list[NavNode]:

@@ -6,8 +6,8 @@ potentially by a future printed TOC page.
 
 from dataclasses import dataclass, field
 
-from sitegen.core.document import get_pages_for_document
-from sitegen.core.nav import Document, NavTree
+from jetpage.core.document import get_pages_for_document
+from jetpage.core.nav import Document, NavTree
 
 
 @dataclass

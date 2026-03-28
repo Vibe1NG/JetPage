@@ -1,6 +1,6 @@
 # Configuration
 
-SiteGen is configured through environment variables and the `content/_meta.json` file.
+JetPage is configured through environment variables and the `content/_meta.json` file.
 
 ## Environment Variables
 

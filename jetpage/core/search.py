@@ -7,8 +7,8 @@ results with a short excerpt. No indexing — suitable for small doc sites.
 from dataclasses import dataclass
 from pathlib import Path
 
-from sitegen.core.nav import NavNode, NavTree
-from sitegen.core.page_resolver import resolve
+from jetpage.core.nav import NavNode, NavTree
+from jetpage.core.page_resolver import resolve
 
 _MIN_QUERY_LEN = 2
 _EXCERPT_WIDTH = 120

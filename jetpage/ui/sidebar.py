@@ -1,6 +1,6 @@
 import flet as ft
 
-from sitegen.core.nav import NavNode, NavTree
+from jetpage.core.nav import NavNode, NavTree
 
 _SIDEBAR_WIDTH = 240
 
@@ -41,23 +41,23 @@ def build_sidebar(
 
 def _light_colors() -> dict:
     return {
-        "sidebar_bg":    "#f6f3f2",
+        "sidebar_bg": "#f6f3f2",
         "section_label": "#6b7280",
-        "active_text":   "#0057c0",
-        "active_bg":     ft.Colors.with_opacity(0.08, "#0057c0"),
-        "default_text":  "#1c1b1b",
-        "hover_bg":      ft.Colors.with_opacity(0.04, "#1c1b1b"),
+        "active_text": "#0057c0",
+        "active_bg": ft.Colors.with_opacity(0.08, "#0057c0"),
+        "default_text": "#1c1b1b",
+        "hover_bg": ft.Colors.with_opacity(0.04, "#1c1b1b"),
     }
 
 
 def _dark_colors() -> dict:
     return {
-        "sidebar_bg":    "#252525",
+        "sidebar_bg": "#252525",
         "section_label": "#8b929e",
-        "active_text":   "#6daeff",
-        "active_bg":     ft.Colors.with_opacity(0.12, "#6daeff"),
-        "default_text":  "#e5e2e1",
-        "hover_bg":      ft.Colors.with_opacity(0.06, "#ffffff"),
+        "active_text": "#6daeff",
+        "active_bg": ft.Colors.with_opacity(0.12, "#6daeff"),
+        "default_text": "#e5e2e1",
+        "hover_bg": ft.Colors.with_opacity(0.06, "#ffffff"),
     }
 
 

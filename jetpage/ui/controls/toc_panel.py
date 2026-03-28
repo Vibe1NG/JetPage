@@ -2,7 +2,7 @@
 
 import flet as ft
 
-_PANEL_WIDTH     = 200
+_PANEL_WIDTH = 200
 _INDENT_PER_LEVEL = 10
 
 
@@ -11,13 +11,19 @@ def build_toc_panel(toc_tokens: list[dict], dark: bool = False, on_anchor_click=
 
     Returns None if there are no sub-headings worth showing (h2+).
     """
-    header_color  = "#8b929e" if dark else "#6b7280"
-    item_color    = "#c5c9d4" if dark else "#414754"   # on_surface_variant
-    active_color  = "#6daeff" if dark else "#0057c0"   # secondary
+    header_color = "#8b929e" if dark else "#6b7280"
+    item_color = "#c5c9d4" if dark else "#414754"  # on_surface_variant
+    active_color = "#6daeff" if dark else "#0057c0"  # secondary
 
     items: list[ft.Control] = []
-    _collect(toc_tokens, items, min_level=2, item_color=item_color,
-             active_color=active_color, on_anchor_click=on_anchor_click)
+    _collect(
+        toc_tokens,
+        items,
+        min_level=2,
+        item_color=item_color,
+        active_color=active_color,
+        on_anchor_click=on_anchor_click,
+    )
 
     if not items:
         return None
@@ -66,9 +72,8 @@ def _collect(
                         overflow=ft.TextOverflow.ELLIPSIS,
                     ),
                     padding=ft.padding.only(left=indent, top=5, bottom=5),
-                    on_click=(lambda _, a=anchor_id: on_anchor_click(a)) if clickable else None,
+                    on_click=(lambda _, a=anchor_id: on_anchor_click(a)) if (clickable and on_anchor_click) else None,
                     ink=clickable,
                 )
             )
-        _collect(token.get("children", []), items, min_level, item_color,
-                 active_color, on_anchor_click)
+        _collect(token.get("children", []), items, min_level, item_color, active_color, on_anchor_click)

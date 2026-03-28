@@ -1,27 +1,28 @@
 import logging
 import threading
+from typing import Any
 
 import flet as ft
 
-from sitegen.config import CONTENT_DIR
-from sitegen.content import cache as page_cache
-from sitegen.core.document import get_document_for_slug
-from sitegen.core.nav import load_nav_tree
-from sitegen.core.navigation import get_breadcrumb, get_prev_next
-from sitegen.core.page_resolver import resolve
-from sitegen.core.search import search
-from sitegen.export.pdf_exporter import export_document
-from sitegen.export.pdf_server import pdf_server
-from sitegen.ui.controls.nav_controls import build_breadcrumb, build_prev_next_bar
-from sitegen.ui.controls.toc_panel import build_toc_panel
-from sitegen.ui.sidebar import build_sidebar
+from jetpage.config import CONTENT_DIR
+from jetpage.content import cache as page_cache
+from jetpage.core.document import get_document_for_slug
+from jetpage.core.nav import load_nav_tree
+from jetpage.core.navigation import get_breadcrumb, get_prev_next
+from jetpage.core.page_resolver import resolve
+from jetpage.core.search import search
+from jetpage.export.pdf_exporter import export_document
+from jetpage.export.pdf_server import pdf_server
+from jetpage.ui.controls.nav_controls import build_breadcrumb, build_prev_next_bar
+from jetpage.ui.controls.toc_panel import build_toc_panel
+from jetpage.ui.sidebar import build_sidebar
 
 logger = logging.getLogger(__name__)
 
 
-_SURFACE       = "#fcf9f8"
-_SURFACE_DARK  = "#1c1b1b"
-_PANEL_WIDTH   = 200  # TOC panel width (matches toc_panel._PANEL_WIDTH)
+_SURFACE = "#fcf9f8"
+_SURFACE_DARK = "#1c1b1b"
+_PANEL_WIDTH = 200  # TOC panel width (matches toc_panel._PANEL_WIDTH)
 
 
 def build_app(page: ft.Page) -> None:
@@ -30,29 +31,29 @@ def build_app(page: ft.Page) -> None:
     page.bgcolor = _SURFACE
 
     nav_tree = load_nav_tree(CONTENT_DIR)
-    page.title = nav_tree.site.get("title", "SiteGen")
+    page.title = nav_tree.site.get("title", "JetPage")
     _docs = nav_tree.documents
 
     _state = {"dark": False, "slug": "index", "tab_index": 0}
 
     # Design token palettes
     _LIGHT = {
-        "topbar_bg":     "#fcf9f8",
-        "topbar_text":   "#1c1b1b",
-        "topbar_icon":   "#1c1b1b",
-        "tab_active":    "#0057c0",
-        "tab_inactive":  "#414754",
-        "spinner":       "#0057c0",
-        "shadow":        ft.Colors.with_opacity(0.07, "#1c1b1b"),
+        "topbar_bg": "#fcf9f8",
+        "topbar_text": "#1c1b1b",
+        "topbar_icon": "#1c1b1b",
+        "tab_active": "#0057c0",
+        "tab_inactive": "#414754",
+        "spinner": "#0057c0",
+        "shadow": ft.Colors.with_opacity(0.07, "#1c1b1b"),
     }
     _DARK = {
-        "topbar_bg":     "#1c1b1b",
-        "topbar_text":   "#e5e2e1",
-        "topbar_icon":   "#e5e2e1",
-        "tab_active":    "#6daeff",
-        "tab_inactive":  "#b0b8c8",
-        "spinner":       "#6daeff",
-        "shadow":        ft.Colors.with_opacity(0.25, "#000000"),
+        "topbar_bg": "#1c1b1b",
+        "topbar_text": "#e5e2e1",
+        "topbar_icon": "#e5e2e1",
+        "tab_active": "#6daeff",
+        "tab_inactive": "#b0b8c8",
+        "spinner": "#6daeff",
+        "shadow": ft.Colors.with_opacity(0.25, "#000000"),
     }
 
     def _tok() -> dict:
@@ -140,7 +141,7 @@ def build_app(page: ft.Page) -> None:
     doc_tab_row = ft.Row(controls=_make_tab_buttons(), spacing=2)
 
     _logo_text = ft.Text(
-        nav_tree.site.get("title", "SiteGen"),
+        nav_tree.site.get("title", "JetPage"),
         size=17,
         weight=ft.FontWeight.BOLD,
         color=_tok()["topbar_text"],
@@ -151,7 +152,7 @@ def build_app(page: ft.Page) -> None:
             controls=[
                 ft.Row(
                     controls=[
-                        ft.Icon(ft.Icons.GRID_VIEW_ROUNDED, size=20, color=_tok()["tab_active"]),
+                        ft.Image(src="/jetpage-logo.svg", height=20),
                         ft.Container(width=6),
                         _logo_text,
                     ],
@@ -192,10 +193,10 @@ def build_app(page: ft.Page) -> None:
     # --- Helpers ---
 
     def _show_snack(message: str, error: bool = False) -> None:
-        page.show_dialog(ft.SnackBar(content=ft.Text(message), bgcolor=ft.Colors.RED_700 if error else None))
-        page.update()
+        page.open(ft.SnackBar(content=ft.Text(message), bgcolor=ft.Colors.RED_700 if error else None))  # type: ignore
 
     def navigate(slug: str) -> None:
+
         page.go(f"/{slug}")
 
     def _current_doc():
@@ -251,10 +252,8 @@ def build_app(page: ft.Page) -> None:
             color=tok["shadow"],
             offset=ft.Offset(0, 2),
         )
+        # Update the logo text color
         _logo_text.color = tok["topbar_text"]
-        # Update the logo icon (first child of the logo Row, which is first in top_bar Row)
-        logo_row = top_bar.content.controls[0]
-        logo_row.controls[0].color = tok["tab_active"]
         btn_style = _icon_btn_style()
         download_btn.icon_color = tok["topbar_icon"]
         download_btn.style = btn_style
@@ -265,7 +264,7 @@ def build_app(page: ft.Page) -> None:
         export_spinner.color = tok["spinner"]
         doc_tab_row.controls = _make_tab_buttons()
 
-    def on_dark_toggle(_e: ft.ControlEvent) -> None:
+    def on_dark_toggle(_e: Any) -> None:
         _state["dark"] = not _state["dark"]
         dark = _state["dark"]
         page.theme_mode = ft.ThemeMode.DARK if dark else ft.ThemeMode.LIGHT
@@ -288,8 +287,7 @@ def build_app(page: ft.Page) -> None:
 
     # --- Search ---
 
-    def on_search_click(_e: ft.ControlEvent) -> None:
-        tok = _tok()
+    def on_search_click(_e: Any) -> None:
         query_field = ft.TextField(
             hint_text="Search documentation…",
             autofocus=True,
@@ -299,30 +297,36 @@ def build_app(page: ft.Page) -> None:
             fill_color=ft.Colors.with_opacity(1.0, "#f6f3f2" if not _state["dark"] else "#252525"),
             focused_color="#0057c0" if not _state["dark"] else "#6daeff",
             prefix_icon=ft.Icons.SEARCH,
-            on_change=None,
         )
         results_col = ft.Column(spacing=2, scroll=ft.ScrollMode.AUTO, height=300)
 
-        secondary = "#0057c0" if not _state["dark"] else "#6daeff"
         on_surface = "#1c1b1b" if not _state["dark"] else "#e5e2e1"
         on_surface_var = "#414754" if not _state["dark"] else "#b0b8c8"
 
+        def on_tile_click(slug: str) -> None:
+            page.close(dialog)  # type: ignore
+            navigate(slug)
+
         def on_query_change(e: ft.ControlEvent) -> None:
-            results = search(e.control.value, CONTENT_DIR, nav_tree)
+            val = getattr(e.control, "value", "")
+            results = search(val, CONTENT_DIR, nav_tree)
             results_col.controls = [
                 ft.ListTile(
                     title=ft.Text(r.title, weight=ft.FontWeight.W_500, color=on_surface),
                     subtitle=ft.Text(
-                        r.excerpt, size=12, max_lines=2,
-                        overflow=ft.TextOverflow.ELLIPSIS, color=on_surface_var,
+                        r.excerpt,
+                        size=12,
+                        max_lines=2,
+                        overflow=ft.TextOverflow.ELLIPSIS,
+                        color=on_surface_var,
                     ),
-                    on_click=lambda _, s=r.slug: (dialog.open.__setattr__("open", False), navigate(s)),
+                    on_click=lambda _, s=r.slug: on_tile_click(s),
                 )
                 for r in results
             ] or [ft.Text("No results", color=on_surface_var, italic=True, size=13)]
             results_col.update()
 
-        query_field.on_change = on_query_change
+        query_field.on_change = on_query_change  # type: ignore
 
         dialog = ft.AlertDialog(
             title=ft.Text("Search", size=16, weight=ft.FontWeight.W_600, color=on_surface),
@@ -331,30 +335,9 @@ def build_app(page: ft.Page) -> None:
                 tight=True,
                 width=500,
             ),
-            on_dismiss=None,
         )
 
-        def on_tile_click(slug: str) -> None:
-            page.pop_dialog()
-            navigate(slug)
-
-        def on_query_change_v2(e: ft.ControlEvent) -> None:
-            results = search(e.control.value, CONTENT_DIR, nav_tree)
-            results_col.controls = [
-                ft.ListTile(
-                    title=ft.Text(r.title, weight=ft.FontWeight.W_500, color=on_surface),
-                    subtitle=ft.Text(
-                        r.excerpt, size=12, max_lines=2,
-                        overflow=ft.TextOverflow.ELLIPSIS, color=on_surface_var,
-                    ),
-                    on_click=lambda _, s=r.slug: on_tile_click(s),
-                )
-                for r in results
-            ] or [ft.Text("No results", color=on_surface_var, italic=True, size=13)]
-            results_col.update()
-
-        query_field.on_change = on_query_change_v2
-        page.show_dialog(dialog)
+        page.open(dialog)  # type: ignore
 
     search_btn.on_click = on_search_click
 
@@ -366,7 +349,7 @@ def build_app(page: ft.Page) -> None:
 
     # --- PDF export ---
 
-    def on_download_click(_e: ft.ControlEvent) -> None:
+    def on_download_click(_e: Any) -> None:
         doc = _current_doc()
         if not doc:
             return
@@ -399,8 +382,9 @@ def build_app(page: ft.Page) -> None:
 
     def _build_content_controls(raw_md: str, toc_tokens: list[dict] | None = None) -> list[ft.Control]:
         import re
-        from sitegen.content.code_splitter import CodeSegment, TextSegment, split_code_blocks
-        from sitegen.ui.controls.code_block import build_code_block
+
+        from jetpage.content.code_splitter import CodeSegment, TextSegment, split_code_blocks
+        from jetpage.ui.controls.code_block import build_code_block
 
         # Build anchor-id lookup from toc_tokens: {heading_name -> id}
         _anchor_map: dict[str, str] = {}
@@ -423,7 +407,7 @@ def build_app(page: ft.Page) -> None:
                 code_theme=ft.MarkdownCodeTheme.GITHUB,
                 selectable=True,
                 latex_scale_factor=1.2,
-                on_tap_link=on_link_tap,
+                on_tap_link=on_link_tap,  # type: ignore
             )
 
         segments = split_code_blocks(raw_md)
@@ -451,7 +435,7 @@ def build_app(page: ft.Page) -> None:
     # --- Link handling ---
 
     def on_link_tap(e: ft.ControlEvent) -> None:
-        href = e.data
+        href = getattr(e, "data", "")
         if href and not href.startswith("http"):
             navigate(href.strip("/"))
 
@@ -464,8 +448,10 @@ def build_app(page: ft.Page) -> None:
 
         # Same page, only hash changed — scroll without re-rendering
         if slug == _state["slug"] and anchor:
+
             async def _scroll() -> None:
                 await content_scroll_col.scroll_to(scroll_key=anchor, duration=300)
+
             page.run_task(_scroll)
             return
 
@@ -478,25 +464,29 @@ def build_app(page: ft.Page) -> None:
                 content_col.controls = _build_content_controls(entry.raw, entry.toc_tokens)
                 _rebuild_toc(entry.toc_tokens)
             else:
-                content_col.controls = [
-                    ft.Markdown(
-                        value=f"# Page Not Found\n\nThe page `{slug}` does not exist.",
-                        extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
-                        selectable=True,
-                        on_tap_link=on_link_tap,
-                    )
-                ]
+                content_col.controls = list[ft.Control](
+                    [
+                        ft.Markdown(
+                            value=f"# Page Not Found\n\nThe page `{slug}` does not exist.",
+                            extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
+                            selectable=True,
+                            on_tap_link=on_link_tap,  # type: ignore
+                        )
+                    ]
+                )
                 _rebuild_toc([])
         except Exception as exc:
             logger.exception("Error loading page %r", slug)
-            content_col.controls = [
-                ft.Markdown(
-                    value=f"# Error\n\nFailed to load `{slug}`:\n\n```\n{exc}\n```",
-                    extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
-                    selectable=True,
-                    on_tap_link=on_link_tap,
-                )
-            ]
+            content_col.controls = list[ft.Control](
+                [
+                    ft.Markdown(
+                        value=f"# Error\n\nFailed to load `{slug}`:\n\n```\n{exc}\n```",
+                        extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
+                        selectable=True,
+                        on_tap_link=on_link_tap,  # type: ignore
+                    )
+                ]
+            )
             _rebuild_toc([])
 
         _update_doc_tab(slug)
@@ -506,10 +496,13 @@ def build_app(page: ft.Page) -> None:
         page.update()
 
         if anchor:
+
             async def _scroll_after_load(a: str = anchor) -> None:
                 import asyncio
+
                 await asyncio.sleep(1.0)
                 await content_scroll_col.scroll_to(scroll_key=a, duration=300)
+
             page.run_task(_scroll_after_load)
 
     page.on_route_change = lambda e: load_route(e.route)

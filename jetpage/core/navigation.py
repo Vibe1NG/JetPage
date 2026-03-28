@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from sitegen.core.nav import NavNode, NavTree
+from jetpage.core.nav import NavNode, NavTree
 
 
 @dataclass

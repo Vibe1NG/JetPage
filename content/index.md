@@ -1,6 +1,6 @@
-# Welcome to SiteGen
+# Welcome to JetPage
 
-SiteGen is a documentation website generator built entirely in Python.
+JetPage is a documentation website generator built entirely in Python.
 It renders pages from a directory of Markdown files using [Flet](https://flet.dev/).
 
 ## Features

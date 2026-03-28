@@ -17,13 +17,13 @@ import pypdf
 from playwright.async_api import async_playwright
 from pygments.formatters import HtmlFormatter
 
-from sitegen.config import CONTENT_DIR
-from sitegen.content.loader import load_page
-from sitegen.content.parser import parse
-from sitegen.core.document import get_pages_for_document
-from sitegen.core.nav import Document, NavTree
-from sitegen.core.page_resolver import resolve
-from sitegen.export.toc_builder import TocEntry, build_toc
+from jetpage.config import CONTENT_DIR
+from jetpage.content.loader import load_page
+from jetpage.content.parser import parse
+from jetpage.core.document import get_pages_for_document
+from jetpage.core.nav import Document, NavTree
+from jetpage.core.page_resolver import resolve
+from jetpage.export.toc_builder import TocEntry, build_toc
 
 logger = logging.getLogger(__name__)
 
