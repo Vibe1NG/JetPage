@@ -142,12 +142,12 @@ def load_nav_tree(content_dir: Path) -> NavTree:
             doc_id = entry.get("document")
             doc = next((d for d in documents if d.id == doc_id), None) if doc_id else None
 
-            if doc:
-                # If it belongs to a document, find the section's directory within that document
+            if doc and entry["slug"].startswith(doc.root):
+                # If it belongs to a document and follows its prefix, find the section's directory within that document
                 rel_path = entry["slug"].removeprefix(doc.root).lstrip("/")
                 effective_section_root = doc.effective_root / rel_path
             else:
-                # Fallback for pages not explicitly tied to a document root
+                # Fallback for pages not explicitly tied to a document root prefix, or no document
                 effective_section_root = content_dir / entry["slug"]
 
             children = _load_section(effective_section_root, entry["slug"], doc_id)

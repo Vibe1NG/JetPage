@@ -276,7 +276,7 @@ def build_app(page: ft.Page) -> None:
         # Rebuild TOC and nav controls with cached tokens
         slug = _state["slug"]
         doc = get_document_for_slug(slug, nav_tree)
-        if doc and doc.effective_root:
+        if doc and doc.effective_root and slug.startswith(doc.root):
             rel_slug = slug.removeprefix(doc.root).lstrip("/") or "index"
             path = resolve(rel_slug, doc.effective_root)
         else:
@@ -465,7 +465,7 @@ def build_app(page: ft.Page) -> None:
 
         try:
             doc = get_document_for_slug(slug, nav_tree)
-            if doc and doc.effective_root:
+            if doc and doc.effective_root and slug.startswith(doc.root):
                 rel_slug = slug.removeprefix(doc.root).lstrip("/") or "index"
                 path = resolve(rel_slug, doc.effective_root)
             else:
