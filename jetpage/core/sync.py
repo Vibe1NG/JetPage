@@ -1,3 +1,7 @@
+"""
+Git documentation synchronization module.
+"""
+
 import subprocess
 import logging
 import shutil
@@ -6,10 +10,17 @@ from jetpage.core.nav import Document
 
 logger = logging.getLogger(__name__)
 
-_SYNCED = False
+_SYNCED: bool = False
 
 
 def sync_git_docs(documents: list[Document], content_dir: Path) -> None:
+    """
+    Synchronize external git repositories for documentation.
+
+    Args:
+        documents: List of documentation objects.
+        content_dir: Root directory for content.
+    """
     global _SYNCED
     if _SYNCED:
         return
@@ -20,10 +31,12 @@ def sync_git_docs(documents: list[Document], content_dir: Path) -> None:
     active_ids = {d.id for d in documents if d.git}
 
     # Cleanup stale
-    if external_dir.exists():
-        for d in external_dir.iterdir():
-            if d.is_dir() and d.name not in active_ids:
+    for d in external_dir.iterdir():
+        if d.name not in active_ids:
+            if d.is_dir():
                 shutil.rmtree(d)
+            else:
+                d.unlink()
 
     for doc in documents:
         if not doc.git:

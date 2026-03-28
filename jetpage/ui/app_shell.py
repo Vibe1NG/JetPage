@@ -275,7 +275,13 @@ def build_app(page: ft.Page) -> None:
         _rebuild_sidebar()
         # Rebuild TOC and nav controls with cached tokens
         slug = _state["slug"]
-        path = resolve(slug, CONTENT_DIR)
+        doc = get_document_for_slug(slug, nav_tree)
+        if doc and doc.effective_root:
+            rel_slug = slug.removeprefix(doc.root).lstrip("/") or "index"
+            path = resolve(rel_slug, doc.effective_root)
+        else:
+            path = resolve(slug, CONTENT_DIR)
+
         if path:
             entry = page_cache.get_page(path)
             _rebuild_toc(entry.toc_tokens)
@@ -458,7 +464,13 @@ def build_app(page: ft.Page) -> None:
         _state["slug"] = slug
 
         try:
-            path = resolve(slug, CONTENT_DIR)
+            doc = get_document_for_slug(slug, nav_tree)
+            if doc and doc.effective_root:
+                rel_slug = slug.removeprefix(doc.root).lstrip("/") or "index"
+                path = resolve(rel_slug, doc.effective_root)
+            else:
+                path = resolve(slug, CONTENT_DIR)
+
             if path:
                 entry = page_cache.get_page(path)
                 content_col.controls = _build_content_controls(entry.raw, entry.toc_tokens)
