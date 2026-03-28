@@ -13,12 +13,21 @@ class NavNode:
 
 
 @dataclass
+class GitSource:
+    url: str
+    path: str | None = None
+    tag: str | None = None
+
+
+@dataclass
 class Document:
     id: str
     title: str
     description: str
     root: str
     color: str
+    git: GitSource | None = None
+    effective_root: Path | None = None
 
 
 @dataclass
@@ -39,16 +48,27 @@ def load_nav_tree(content_dir: Path) -> NavTree:
 
     site = meta.get("site", {})
 
-    documents = [
-        Document(
-            id=d["id"],
-            title=d["title"],
-            description=d.get("description", ""),
-            root=d["root"],
-            color=d.get("color", "#4A90D9"),
+    documents = []
+    for d in meta.get("documents", []):
+        git_data = d.get("git")
+        git_source = None
+        if git_data:
+            git_source = GitSource(
+                url=git_data["url"],
+                path=git_data.get("path"),
+                tag=git_data.get("tag"),
+            )
+
+        documents.append(
+            Document(
+                id=d["id"],
+                title=d["title"],
+                description=d.get("description", ""),
+                root=d["root"],
+                color=d.get("color", "#4A90D9"),
+                git=git_source,
+            )
         )
-        for d in meta.get("documents", [])
-    ]
 
     nodes: list[NavNode] = []
     for entry in meta.get("nav", []):
