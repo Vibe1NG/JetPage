@@ -192,6 +192,13 @@ def build_app(page: ft.Page) -> None:
 
     # --- Helpers ---
 
+    def _resolve_slug_to_path(slug: str):
+        doc = get_document_for_slug(slug, nav_tree)
+        if doc and doc.effective_root and slug.startswith(doc.root):
+            rel_slug = slug.removeprefix(doc.root).lstrip("/") or "index"
+            return resolve(rel_slug, doc.effective_root)
+        return resolve(slug, CONTENT_DIR)
+
     def _show_snack(message: str, error: bool = False) -> None:
         page.open(ft.SnackBar(content=ft.Text(message), bgcolor=ft.Colors.RED_700 if error else None))  # type: ignore
 
@@ -275,12 +282,7 @@ def build_app(page: ft.Page) -> None:
         _rebuild_sidebar()
         # Rebuild TOC and nav controls with cached tokens
         slug = _state["slug"]
-        doc = get_document_for_slug(slug, nav_tree)
-        if doc and doc.effective_root and slug.startswith(doc.root):
-            rel_slug = slug.removeprefix(doc.root).lstrip("/") or "index"
-            path = resolve(rel_slug, doc.effective_root)
-        else:
-            path = resolve(slug, CONTENT_DIR)
+        path = _resolve_slug_to_path(slug)
 
         if path:
             entry = page_cache.get_page(path)
@@ -464,12 +466,7 @@ def build_app(page: ft.Page) -> None:
         _state["slug"] = slug
 
         try:
-            doc = get_document_for_slug(slug, nav_tree)
-            if doc and doc.effective_root and slug.startswith(doc.root):
-                rel_slug = slug.removeprefix(doc.root).lstrip("/") or "index"
-                path = resolve(rel_slug, doc.effective_root)
-            else:
-                path = resolve(slug, CONTENT_DIR)
+            path = _resolve_slug_to_path(slug)
 
             if path:
                 entry = page_cache.get_page(path)
